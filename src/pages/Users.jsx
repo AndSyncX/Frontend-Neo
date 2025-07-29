@@ -16,7 +16,6 @@ const Users = () => {
     id: "",
     name: "",
     email: "",
-    password: "",
     role: "",
   });
 
@@ -30,7 +29,7 @@ const Users = () => {
 
   const handleSearch = () => {
     if (!searchName) return;
-    getUserByName(searchName).then((res) => {
+    getUserById(searchName).then((res) => {
       if (res.data) setFormData(res.data);
     });
   };
@@ -44,7 +43,7 @@ const Users = () => {
   const handleUpdate = async () => {
     await updateUser(formData.id, formData);
     fetchUsers();
-    setFormData({ id: "", name: "", email: "", password: "", role: "" });
+    setFormData({ id: "", name: "", email: "", role: "" });
   };
 
   const handleDelete = (id) => {
@@ -55,12 +54,12 @@ const Users = () => {
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Sí, eliminar",
+      confirmButtonText: "Sí, desactivar",
     }).then(async (result) => {
       if (result.isConfirmed) {
         await deleteUser(id);
         fetchUsers();
-        Swal.fire("Eliminado", "El usuario fue eliminado correctamente", "success");
+        Swal.fire("Eliminado", "El usuario fue desactivado correctamente", "success");
       }
     });
   };
@@ -140,6 +139,7 @@ const Users = () => {
         <table className="min-w-full bg-gray-100 rounded">
           <thead className="bg-gray-200">
             <tr className="text-left text-blue-600">
+              <th className="px-4 py-2">Id</th>
               <th className="px-4 py-2">Nombre</th>
               <th className="px-4 py-2">Email</th>
               <th className="px-4 py-2">Rol</th>
@@ -150,6 +150,7 @@ const Users = () => {
           <tbody>
             {users.map((user) => (
               <tr key={user.id} className="border-t border-gray-300">
+                <td className="px-4 py-2">{user.id}</td>
                 <td className="px-4 py-2">{user.name}</td>
                 <td className="px-4 py-2">{user.email}</td>
                 <td className="px-4 py-2">{user.role}</td>
