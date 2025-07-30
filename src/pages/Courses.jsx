@@ -2,15 +2,18 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   getAllCourses,
-  getCourseById,
   createCourse,
   updateCourse,
 } from "../api/courseService";
-import { getUserById } from "../api/userService";
+import { 
+  getUserById,
+  getAllTeachers
+} from "../api/userService";
 import Swal from "sweetalert2";
 
 const Courses = () => {
   const [courses, setCourses] = useState([]);
+  const [teachers, setTeachers] = useState([]);
   const [searchName, setSearchName] = useState("");
   const [editId, setEditId] = useState(null);
 
@@ -24,29 +27,18 @@ const Courses = () => {
 
   useEffect(() => {
     fetchCourses();
+    fetchTeachers();
   }, []);
 
   const fetchCourses = () => {
     getAllCourses().then((res) => setCourses(res.data));
   };
 
-  const handleSearch = () => {
-    if (!searchName) return;
-    getCourseById(searchName).then((res) => {
-      if (res.data) {
-        const course = res.data;
-        setEditId(course.id);
-        setValue("name", course.name);
-        setValue("description", course.description);
-        setValue("userId", course.userId);
-        setValue("startDate", course.startDate);
-        setValue("endDate", course.endDate);
-      }
-    });
+  const fetchTeachers = () => {
+    getAllTeachers().then((res) => setTeachers(res.data));
   };
 
   const onSubmit = async (data) => {
-  try {
     if (editId) {
       await getUserById(data.userId);
       await updateCourse(editId, data);
@@ -59,35 +51,22 @@ const Courses = () => {
     fetchCourses();
     reset();
     setEditId(null);
-
-  } catch (error) {
-    if (error.response?.status === 404) {
-      Swal.fire("Error", "El docente con ese ID no existe", "error");
-    } else {
-      Swal.fire("Error", "Ocurrió un error al procesar la solicitud", "error");
-    }
-  }
-};
+  };
 
   return (
     <div className="flex-grow bg-white p-6 rounded-lg min-h-screen">
       <h1 className="text-2xl font-bold text-gray-800 mb-4">Gestión de Cursos</h1>
 
       {/* Búsqueda */}
-      <div className="mb-4 flex gap-2">
+      <div className="mb-4">
         <input
           type="text"
-          placeholder="Buscar por ID"
+          placeholder="Buscar por nombre del curso"
           value={searchName}
           onChange={(e) => setSearchName(e.target.value)}
           className="border border-gray-300 p-2 rounded w-64"
+          name="search"
         />
-        <button
-          onClick={handleSearch}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-        >
-          Buscar
-        </button>
       </div>
 
       {/* Formulario */}
@@ -112,15 +91,17 @@ const Courses = () => {
           {errors.description && <p className="text-red-500 text-sm">{errors.description.message}</p>}
         </div>
 
-        <div>
-          <input
-            type="text"
-            placeholder="Nombre del docente"
-            {...register("userId", { required: "Docente requerido" })}
-            className="border p-2 rounded w-full"
-          />
-          {errors.userId && <p className="text-red-500 text-sm">{errors.userId.message}</p>}
-        </div>
+        <select
+          {...register("userId", { required: "Docente requerido" })}
+          className="border p-2 rounded w-full"
+        >
+          <option value="">Seleccione un docente</option>
+          {teachers.map((teacher) => (
+            <option key={teacher.id} value={String(teacher.id)}>
+              {String(teacher.name)}
+            </option>
+          ))}
+        </select>
 
         <div>
           <input
@@ -180,30 +161,32 @@ const Courses = () => {
             </tr>
           </thead>
           <tbody>
-            {courses.map((course) => (
-              <tr key={course.id} className="border-t border-gray-300">
-                <td className="px-4 py-2">{course.name}</td>
-                <td className="px-4 py-2">{course.description}</td>
-                <td className="px-4 py-2">{course.userFullName}</td>
-                <td className="px-4 py-2">{course.startDate}</td>
-                <td className="px-4 py-2">{course.endDate}</td>
-                <td className="px-4 py-2 flex gap-2">
-                  <button
-                    onClick={() => {
-                      setEditId(course.id);
-                      setValue("name", course.name);
-                      setValue("description", course.description);
-                      setValue("userId", course.userId);
-                      setValue("startDate", course.startDate);
-                      setValue("endDate", course.endDate);
-                    }}
-                    className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
-                  >
-                    Modificar
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {courses
+              .filter(course => course.name.toLowerCase().includes(searchName.toLowerCase()))
+              .map((course) => (
+                <tr key={course.id} className="border-t border-gray-300">
+                  <td className="px-4 py-2">{course.name}</td>
+                  <td className="px-4 py-2">{course.description}</td>
+                  <td className="px-4 py-2">{course.userFullName}</td>
+                  <td className="px-4 py-2">{course.startDate}</td>
+                  <td className="px-4 py-2">{course.endDate}</td>
+                  <td className="px-4 py-2 flex gap-2">
+                    <button
+                      onClick={() => {
+                        setEditId(course.id);
+                        setValue("name", course.name);
+                        setValue("description", course.description);
+                        setValue("userId", String(course.userId));
+                        setValue("startDate", course.startDate);
+                        setValue("endDate", course.endDate);
+                      }}
+                      className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
+                    >
+                      Modificar
+                    </button>
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>
