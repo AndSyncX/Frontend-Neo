@@ -6,6 +6,7 @@ import {
   createCourse,
   updateCourse,
 } from "../api/courseService";
+import { getUserById } from "../api/userService";
 import Swal from "sweetalert2";
 
 const Courses = () => {
@@ -45,17 +46,28 @@ const Courses = () => {
   };
 
   const onSubmit = async (data) => {
+  try {
     if (editId) {
+      await getUserById(data.userId);
       await updateCourse(editId, data);
       Swal.fire("Modificado", "El curso fue modificado exitosamente", "success");
     } else {
       await createCourse(data);
       Swal.fire("Creado", "El curso fue creado exitosamente", "success");
     }
+
     fetchCourses();
     reset();
     setEditId(null);
-  };
+
+  } catch (error) {
+    if (error.response?.status === 404) {
+      Swal.fire("Error", "El docente con ese ID no existe", "error");
+    } else {
+      Swal.fire("Error", "Ocurrió un error al procesar la solicitud", "error");
+    }
+  }
+};
 
   return (
     <div className="flex-grow bg-white p-6 rounded-lg min-h-screen">
@@ -172,7 +184,7 @@ const Courses = () => {
               <tr key={course.id} className="border-t border-gray-300">
                 <td className="px-4 py-2">{course.name}</td>
                 <td className="px-4 py-2">{course.description}</td>
-                <td className="px-4 py-2">{course.userId}</td>
+                <td className="px-4 py-2">{course.userFullName}</td>
                 <td className="px-4 py-2">{course.startDate}</td>
                 <td className="px-4 py-2">{course.endDate}</td>
                 <td className="px-4 py-2 flex gap-2">
