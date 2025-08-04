@@ -8,7 +8,9 @@ import {
   UploadCloud,
   Settings,
   LogOut,
-  Box
+  Box,
+  UniversityIcon,
+  University
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -39,6 +41,10 @@ const AdminSidebar = () => {
         {/* Sección GESTIÓN */}
         <h2 className="text-sm text-slate-400 uppercase mb-3">Gestión</h2>
         <nav className="space-y-2">
+          <Link to="/careers" className="flex items-center gap-3 px-4 py-2 rounded-md hover:bg-cyan-800/40 transition">
+            <University className="w-5 h-5" />
+            <span>Carreras</span>
+          </Link>
           <Link to="/courses" className="flex items-center gap-3 px-4 py-2 rounded-md hover:bg-cyan-800/40 transition">
             <BookOpen className="w-5 h-5" />
             <span>Cursos</span>

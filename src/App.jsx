@@ -2,7 +2,8 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Layout from "../src/layout/layout";
 import Users from "../src/pages/Users"
 import Courses from "../src/pages/Courses"
-import Task from "../src/pages/Task"
+import Career from "../src/pages/Career"
+import AcademicCycle from "../src/pages/AcademicCycle"
 import Material from "../src/pages/Material"
 import Enrollment from "../src/pages/Enrollment"
 import AssignmentDelivery from "../src/pages/AssignmentDelivery"
@@ -28,10 +29,10 @@ function App() {
             }
           />
           <Route
-            path="/tasks"
+            path="/careers"
             element={
               <Layout>
-                <Task />
+                <Career />
               </Layout>
             }
           />
@@ -40,6 +41,14 @@ function App() {
             element={
               <Layout>
                 <Enrollment />
+              </Layout>
+            }
+          />
+          <Route
+            path="/academic-cycles"
+            element={
+              <Layout>
+                <AcademicCycle />
               </Layout>
             }
           />

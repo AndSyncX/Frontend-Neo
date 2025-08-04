@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
-  getAllCourses,
-  createCourse,
-  updateCourse,
-} from "../api/courseService";
+  getAllCycles,
+  createCycle,
+  updateCycle
+} from "../api/academicCycle";
 import Swal from "sweetalert2";
 
-const Courses = () => {
-  const [courses, setCourses] = useState([]);
+const Cycle = () => {
+  const [cycle, setCycle] = useState([]);
   const [searchName, setSearchName] = useState("");
   const [editId, setEditId] = useState(null);
 
@@ -21,38 +21,38 @@ const Courses = () => {
   } = useForm();
 
   useEffect(() => {
-    fetchCourses();
+    fetchCycle();
   }, []);
 
-  const fetchCourses = () => {
-    getAllCourses().then((res) => setCourses(res.data));
+  const fetchCycle = () => {
+    getAllCycles().then( (res) => setCycle(res.data));
   };
 
   const onSubmit = async (data) => {
     data.active = JSON.parse(String(data.active));
 
     if (editId) {
-      await updateCourse(editId, data);
-      Swal.fire("Modificado", "El curso fue modificado exitosamente", "success");
+      await updateCycle(editId, data);
+      Swal.fire("Modificado", "El ciclo académico fue modificado exitosamente", "success");
     } else {
-      await createCourse(data);
-      Swal.fire("Creado", "El curso fue creado exitosamente", "success");
+      await createCycle(data);
+      Swal.fire("Creado", "El ciclo académico fue creada exitosamente", "success");
     }
 
-    fetchCourses();
+    fetchCycle();
     reset();
     setEditId(null);
-  };
+};
 
   return (
     <div className="flex-grow bg-white p-6 min-h-screen">
-      <h1 className="text-2xl font-bold text-gray-800 mb-4">Gestión de Cursos</h1>
+      <h1 className="text-2xl font-bold text-gray-800 mb-4">Gestión del Ciclo Académicos</h1>
 
       {/* Búsqueda */}
       <div className="mb-4">
         <input
           type="text"
-          placeholder="Buscar por nombre del curso"
+          placeholder="Buscar por nombre de la ciclo"
           value={searchName}
           onChange={(e) => setSearchName(e.target.value)}
           className="border border-gray-300 p-2 rounded w-64"
@@ -66,7 +66,7 @@ const Courses = () => {
           <label className="block mb-1 font-medium">Nombre:</label>
           <input
             type="text"
-            placeholder="Nombre"
+            placeholder="Nombre del ciclo académico"
             {...register("name", { required: "Nombre requerido" })}
             className="border p-2 rounded w-full"
           />
@@ -74,25 +74,25 @@ const Courses = () => {
         </div>
 
         <div>
-          <label className="block mb-1 font-medium">Código:</label>
+          <label className="block mb-1 font-medium">Fecha de Inicio:</label>
           <input
-            type="text"
-            placeholder="Código"
-            {...register("code", { required: "Código requerido" })}
+            type="date"
+            placeholder="Facultad"
+            {...register("faculty", { required: "Fecha de inicio requerida" })}
             className="border p-2 rounded w-full"
           />
-          {errors.code && <p className="text-red-500 text-sm">{errors.code.message}</p>}
+          {errors.startDate && <p className="text-red-500 text-sm">{errors.startDate.message}</p>}
         </div>
-        
+
         <div>
-          <label className="block mb-1 font-medium">Creditos:</label>
+          <label className="block mb-1 font-medium">Fecha de Fin:</label>
           <input
-            type="number"
-            placeholder="Número de créditos"
-            {...register("credits", { required: "Número de créditos requerido" })}
+            type="date"
+            placeholder="Duración"
+            {...register("durationYears", { required: "Fecha de culminación requerida" })}
             className="border p-2 rounded w-full"
           />
-          {errors.credits && <p className="text-red-500 text-sm">{errors.credits.message}</p>}
+          {errors.endDate && <p className="text-red-500 text-sm">{errors.endDate.message}</p>}
         </div>
 
         <div>
@@ -115,7 +115,7 @@ const Courses = () => {
               editId ? "bg-green-600 hover:bg-green-700" : "bg-blue-600 hover:bg-blue-700"
             } text-white px-4 py-2 rounded`}
           >
-            {editId ? "Modificar Curso" : "Crear Curso"}
+            {editId ? "Modificar Ciclo Académico" : "Crear Ciclo Académico"}
           </button>
           {editId && (
             <button
@@ -138,29 +138,29 @@ const Courses = () => {
           <thead className="bg-gray-200">
             <tr className="text-left text-blue-600">
               <th className="px-4 py-2">Nombre</th>
-              <th className="px-4 py-2">Codigo</th>
-              <th className="px-4 py-2">Creditos</th>
+              <th className="px-4 py-2">Facultad</th>
+              <th className="px-4 py-2">Años de duración</th>
               <th className="px-4 py-2">Activo</th>
               <th className="px-4 py-2">Acciones</th>
             </tr>
           </thead>
           <tbody>
-            {courses
-              .filter(course => course.name.toLowerCase().includes(searchName.toLowerCase()))
-              .map((course) => (
-                <tr key={course.id} className="border-t border-gray-300">
-                  <td className="px-4 py-2">{course.name}</td>
-                  <td className="px-4 py-2">{course.code}</td>
-                  <td className="px-4 py-2">{course.credits}</td>
-                  <td className="px-4 py-2">{course.active ? "SI" : "NO"}</td>
+            {cycle
+              .filter(cycle => cycle.name.toLowerCase().includes(searchName.toLowerCase()))
+              .map((cycle) => (
+                <tr key={cycle.id} className="border-t border-gray-300">
+                  <td className="px-4 py-2">{cycle.name}</td>
+                  <td className="px-4 py-2">{cycle.faculty}</td>
+                  <td className="px-4 py-2">{cycle.durationYears}</td>
+                  <td className="px-4 py-2">{cycle.active ? "SI" : "NO"}</td>
                   <td className="px-4 py-2 flex gap-2">
                     <button
                       onClick={() => {
-                        setEditId(course.id);
-                        setValue("name", course.name);
-                        setValue("code", course.code);
-                        setValue("credits", course.credits);
-                        setValue("active", String(course.active));
+                        setEditId(cycle.id);
+                        setValue("name", cycle.name);
+                        setValue("faculty", cycle.faculty);
+                        setValue("durationYears", cycle.durationYears);
+                        setValue("active", String(cycle.active));
                       }}
                       className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
                     >
@@ -176,4 +176,4 @@ const Courses = () => {
   );
 };
 
-export default Courses;
+export default Cycle;
